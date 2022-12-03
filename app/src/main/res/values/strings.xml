@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Clock</string>
+    <string name="five_min">৫ মিনিট পরে সময় বলবে</string>
+    <string name="fifteen_min">১৫ মিনিট পরে সময় বলবে</string>
+    <string name="thirty_min">৩০ মিনিট পরে সময় বলবে</string>
+    <string name="sixty_min">৬০ মিনিট পরে সময় বলবে</string>
+</resources>
