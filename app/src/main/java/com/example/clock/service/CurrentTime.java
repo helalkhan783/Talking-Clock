@@ -23,6 +23,29 @@ public class CurrentTime {
     private static String dateFormatForPm(String date) { //for this format (yyy-MM-dd hh:mma)
         String datetime = null;
         java.text.DateFormat inputFormat = new SimpleDateFormat("dd-MMM-yy hh.mm aa");
+        SimpleDateFormat d = new SimpleDateFormat("hh.mm");
+        try {
+            Date convertedDate = inputFormat.parse(date);
+            datetime = d.format(convertedDate);
+
+        } catch (Exception e) {
+
+        }
+        return datetime;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static String getCurrentDate1() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MMM-yy hh.mm aa");
+        String formattedDate = dateFormat.format(new Date()).toString();
+
+        return dateFormatForPm1(formattedDate);
+
+    }
+
+    private static String dateFormatForPm1(String date) { //for this format (yyy-MM-dd hh:mma)
+        String datetime = null;
+        java.text.DateFormat inputFormat = new SimpleDateFormat("dd-MMM-yy hh.mm aa");
         SimpleDateFormat d = new SimpleDateFormat("hh.mm aa");
         try {
             Date convertedDate = inputFormat.parse(date);
@@ -33,5 +56,6 @@ public class CurrentTime {
         }
         return datetime;
     }
+
 
 }

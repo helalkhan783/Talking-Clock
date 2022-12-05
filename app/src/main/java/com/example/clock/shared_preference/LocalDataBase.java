@@ -6,35 +6,82 @@ import android.content.SharedPreferences;
 import com.example.clock.screens.MainActivity;
 
 public class LocalDataBase {
-    Context context;
+
     private static final String NAME = "SCHEDULER";
+    private static final String CURRENT_TIME = "CURRENT_TIME";
 
-    public LocalDataBase(Context context) {
-        this.context = context;
-    }
 
-    public   void saveScheduler(Integer schedulerTime) {//for save store Id
+
+    public static void saveScheduler(Float schedulerTime) {//for save store Id
         try {
-            SharedPreferences preferences = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+            SharedPreferences preferences = MainActivity.context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt("schedulerTime", schedulerTime);
+            editor.putFloat("schedulerTime", schedulerTime);
             editor.apply();
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
+    }
+   public static void scheduleTimeForSelected(Float schedulerTime) {//for save store Id
+        try {
+            SharedPreferences preferences = MainActivity.context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putFloat("schedulerTime", schedulerTime);
+            editor.apply();
+        } catch (Exception e) {
+        }
     }
 
-    public   Integer getScheduler() {
-        SharedPreferences prfs = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        Integer schedulerTime = prfs.getInt("schedulerTime", 0);
+
+    public static Float getSchedulerForSelected() {
+        SharedPreferences prfs = MainActivity.context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+        Float schedulerTime = prfs.getFloat("schedulerTime", 0f);
         return schedulerTime;
     }
 
-    public void deleteCustomerData(String schedulerTime) {
-        SharedPreferences preferences = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+    public static Float getScheduler() {
+        SharedPreferences prfs = MainActivity.context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+        Float schedulerTime = prfs.getFloat("schedulerTime", 0f);
+        return schedulerTime;
+    }
+
+    public static void deleteCustomerData( ) {
+        SharedPreferences preferences = MainActivity.context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.commit();
 
-       // saveScheduler(schedulerTime);
+        // saveScheduler(schedulerTime);
     }
+
+
+    public static void setCurrentTime(Float currentTime) {//for save store Id
+        try {
+            SharedPreferences preferences =MainActivity. context.getSharedPreferences(CURRENT_TIME, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putFloat("currentTime", currentTime);
+            editor.apply();
+        } catch (Exception e) {
+        }
+
+
+    }
+
+    public static Float getCurrentTime() {//for save store Id
+        SharedPreferences prfs =MainActivity. context.getSharedPreferences(CURRENT_TIME, Context.MODE_PRIVATE);
+        Float schedulerTime = prfs.getFloat("currentTime", 0f);
+        return schedulerTime;
+    }
+
+    public static void deleteCurrentTime() {
+        SharedPreferences preferences = MainActivity.context.getSharedPreferences(CURRENT_TIME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.commit();
+
+        // saveScheduler(schedulerTime);
+    }
+
+
+
 
 }

@@ -4,20 +4,21 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
 import com.example.clock.screens.MainActivity;
-import com.example.clock.shared_preference.LocalDataBase;
+import com.example.clock.screens.WakeUpActivity;
 
-public class ExecutableService extends BroadcastReceiver {
-
-
+public class WeakReceiver extends BroadcastReceiver {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onReceive(Context context, Intent intent) {
-        MainActivity.setDataToScheduler("sdf");
-    //  new MainActivity().setTime(LocalDataBase.getScheduler(), context);
+        Intent intent1 = new Intent(context, WakeUpActivity.class);
+        intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent1);
+       // MainActivity.setDataToScheduler("");
+
+
     }
 }

@@ -2,71 +2,143 @@ package com.example.clock.screens;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+
+import android.app.ActivityManager;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RadioGroup;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.example.clock.R;
-import com.example.clock.handler.AlermHandler;
+import com.example.clock.databinding.ActivityMainBinding;
 import com.example.clock.service.CurrentTime;
+import com.example.clock.service.Restarter;
+import com.example.clock.service.YourService;
 import com.example.clock.shared_preference.LocalDataBase;
 
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
-    LocalDataBase localDataBase;
-    private static TextToSpeech textToSpeech;
-    RadioGroup radioGroup;
+public class MainActivity extends BaseActivity {
+    private ActivityMainBinding binding;
 
+    private Intent mServiceIntent;
+    private YourService mYourService;
+
+    private static TextToSpeech textToSpeech;
+    public static Context context;
+    public static float scheduleTime;
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        localDataBase = new LocalDataBase(this);
-        initAll();
-        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        context = this;
+        // if one time radio btn is selected
+        selectedRadioBtn();
+        // initiate text to speech engine
+        textToSpeechManage();
+        binding.radioGroud.setOnCheckedChangeListener((group, checkedId) -> {
             switch (checkedId) {
                 case R.id.previous:
-                    setDataToLocal(1);
+                    startServiceAndScheduleSetToLocal(1f);
                     break;
                 case R.id.fiveMin:
-                    setDataToLocal(5);
+                    startServiceAndScheduleSetToLocal(5f);
                     break;
                 case R.id.fifteenMin:
-                    setDataToLocal(15);
+                    startServiceAndScheduleSetToLocal(15f);
                     break;
                 case R.id.thirtyMin:
-                    setDataToLocal(30);
+                    startServiceAndScheduleSetToLocal(30f);
                     break;
                 case R.id.sixtyMin:
-                    setDataToLocal(60);
+                    startServiceAndScheduleSetToLocal(60f);
                     break;
             }
 
         });
-        textToSpeechManage();
-
     }
 
-    private void setDataToLocal(Integer scheduleTime) {
-        localDataBase.saveScheduler(scheduleTime);
-        setTime(localDataBase.getScheduler());
-    }
 
-    public void setTime(long triggerAfter) {
-        try {
-            AlermHandler alermHandler = new AlermHandler(this);
-            alermHandler.cancel();
-            alermHandler.setAlarmManager(triggerAfter);
-        } catch (Exception e) {
+    private void selectedRadioBtn() {
+        if (LocalDataBase.getSchedulerForSelected() > 0) {
+            if (LocalDataBase.getSchedulerForSelected() == 1) {
+                binding.radioGroud.check(binding.previous.getId());
+            }
+            if (LocalDataBase.getSchedulerForSelected() == 5) {
+                binding.radioGroud.check(binding.fifteenMin.getId());
+            }
+            if (LocalDataBase.getSchedulerForSelected() == 15) {
+                binding.radioGroud.check(binding.fifteenMin.getId());
+            }
+            if (LocalDataBase.getSchedulerForSelected() == 30) {
+                binding.radioGroud.check(binding.thirtyMin.getId());
+            }
+            if (LocalDataBase.getSchedulerForSelected() == 60) {
+                binding.radioGroud.check(binding.sixtyMin.getId());
+            }
+
         }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void startServiceAndScheduleSetToLocal(float v) {
+
+        LocalDataBase.scheduleTimeForSelected(v);//for selected
+        LocalDataBase.setCurrentTime(Float.parseFloat(CurrentTime.getCurrentDate()));
+        LocalDataBase.saveScheduler(v);
+        mYourService = new YourService();
+        mServiceIntent = new Intent(this, mYourService.getClass());
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (!isMyServiceRunning(mYourService.getClass())) {
+                startForegroundService(mServiceIntent);
+            }
+
+        } else {
+            if (!isMyServiceRunning(mYourService.getClass())) {
+                startService(mServiceIntent);
+            }
+        }
+
+
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                Log.i("Service status", "Running");
+                return true;
+            }
+        }
+        Log.i("Service status", "Not running");
+        return false;
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        //stopService(mServiceIntent);
+       reStartService();
+        super.onDestroy();
+    }
+
+
+
+    @Override
+    protected void onStop() {
+        reStartService();
+        super.onStop();
     }
 
     private void textToSpeechManage() {
@@ -87,31 +159,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static void setDataToScheduler(String s) {
-        int speechStatus = textToSpeech.speak(CurrentTime.getCurrentDate(), TextToSpeech.QUEUE_FLUSH, null);
+    public static void textToSpeech() {
+        int speechStatus = textToSpeech.speak(CurrentTime.getCurrentDate1(), TextToSpeech.QUEUE_FLUSH, null);
         if (speechStatus == TextToSpeech.ERROR) {
             Log.e("TTS", "Error in converting Text to Speech!");
         }
-    }
-
-    private void initAll() {
-        radioGroup = findViewById(R.id.radioGroud);
-    }
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-//        if (textToSpeech != null) {
-//            textToSpeech.stop();
-//            textToSpeech.shutdown();
-//        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 }
