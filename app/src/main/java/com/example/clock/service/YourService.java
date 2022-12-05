@@ -122,16 +122,16 @@ public class YourService extends Service {
 
                     if (customMinute < 60) {
                         String hour = null, min = null;
-                        if (customHour < 9) {
+                        if (customHour <= 9) {
                             hour = "0" + customHour;
                         }
                         if (customHour > 9) {
                             hour = "" + customHour;
                         }
-                        if (String.valueOf(customMinute).length() > 2) {
+                        if (customMinute >= 9) {
                             min = "0" + customMinute;
                         }
-                        if (String.valueOf(customMinute).length() == 2) {
+                        if (customMinute > 9) {
                             min = "" + customMinute;
                         }
                         if (hour != null && min != null) {
@@ -157,7 +157,7 @@ public class YourService extends Service {
     }
 
     private String getMin(int gg) {
-        if (String.valueOf(gg).length() == 2) {
+        if (gg > 9) {
             return String.valueOf(gg);
         } else {
             return "0" + gg;

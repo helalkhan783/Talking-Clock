@@ -25,7 +25,7 @@ import com.example.clock.shared_preference.LocalDataBase;
 
 import java.util.Locale;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
 
     private Intent mServiceIntent;
@@ -33,7 +33,6 @@ public class MainActivity extends BaseActivity {
 
     private static TextToSpeech textToSpeech;
     public static Context context;
-    public static float scheduleTime;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -97,7 +96,7 @@ public class MainActivity extends BaseActivity {
         LocalDataBase.saveScheduler(v);
         mYourService = new YourService();
         mServiceIntent = new Intent(this, mYourService.getClass());
-
+       // Toast.makeText(MainActivity.this, ""+LocalDataBase.getSchedulerForSelected(), Toast.LENGTH_SHORT).show();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if (!isMyServiceRunning(mYourService.getClass())) {
@@ -128,16 +127,17 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        //stopService(mServiceIntent);
-       reStartService();
+       //  stopService(mServiceIntent);
+        restartSerVice();
         super.onDestroy();
     }
 
 
 
+
     @Override
     protected void onStop() {
-        reStartService();
+        restartSerVice();
         super.onStop();
     }
 
@@ -165,5 +165,13 @@ public class MainActivity extends BaseActivity {
         if (speechStatus == TextToSpeech.ERROR) {
             Log.e("TTS", "Error in converting Text to Speech!");
         }
+    }
+
+    private void restartSerVice() {
+        Intent broadcastIntent = new Intent();
+        broadcastIntent.setAction("restartservice");
+        broadcastIntent.setClass(this, Restarter.class);
+        this.sendBroadcast(broadcastIntent);
+
     }
 }
