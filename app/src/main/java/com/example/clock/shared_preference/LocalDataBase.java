@@ -3,49 +3,61 @@ package com.example.clock.shared_preference;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.example.clock.screens.MainActivity;
-
 public class LocalDataBase {
+    Context context;
+
+    public LocalDataBase(Context context) {
+        this.context = context;
+    }
 
     private static final String NAME = "SCHEDULER";
-    private static final String CURRENT_TIME = "CURRENT_TIME";
+    private static final String SELECTED_SCHEDULER = "SELECTED_SCHEDULER";
+    private static final String SET_CURRENT_TIME = "CURRENT_TIME";
+    private static final String SPEECT_STATUS = "SPEECT_STATUS";
 
 
+    public void saveScheduler(String schedulerTime) {//for save store Id
 
-    public static void saveScheduler(Float schedulerTime) {//for save store Id
+        SharedPreferences preferences = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("schedulerTime", schedulerTime);
+        editor.apply();
+
+    }
+
+    public void scheduleTimeForSelected(String selectedScheduleTime) {//for save store Id
         try {
-            SharedPreferences preferences = MainActivity.context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+            SharedPreferences preferences = context.getSharedPreferences(SELECTED_SCHEDULER, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putFloat("schedulerTime", schedulerTime);
+            editor.putString("selectedScheduleTime", selectedScheduleTime);
             editor.apply();
         } catch (Exception e) {
         }
     }
-   public static void scheduleTimeForSelected(Float schedulerTime) {//for save store Id
-        try {
-            SharedPreferences preferences = MainActivity.context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putFloat("schedulerTime", schedulerTime);
-            editor.apply();
-        } catch (Exception e) {
-        }
+
+    public void deletescheduleTimeForSelecteda() {
+        SharedPreferences preferences = context.getSharedPreferences(SELECTED_SCHEDULER, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.commit();
+
+        // saveScheduler(schedulerTime);
     }
 
-
-    public static Float getSchedulerForSelected() {
-        SharedPreferences prfs = MainActivity.context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        Float schedulerTime = prfs.getFloat("schedulerTime", 0f);
-        return schedulerTime;
+    public Integer getSchedulerForSelected() {
+        SharedPreferences prfs = context.getSharedPreferences(SELECTED_SCHEDULER, Context.MODE_PRIVATE);
+        String schedulerTime = prfs.getString("selectedScheduleTime", "0");
+        return Integer.parseInt(schedulerTime);
     }
 
-    public static Float getScheduler() {
-        SharedPreferences prfs = MainActivity.context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
-        Float schedulerTime = prfs.getFloat("schedulerTime", 0f);
-        return schedulerTime;
+    public Integer getScheduler() {
+        SharedPreferences prfs = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+        String schedulerTime = prfs.getString("schedulerTime", "0");
+        return Integer.parseInt(schedulerTime);
     }
 
-    public static void deleteCustomerData( ) {
-        SharedPreferences preferences = MainActivity.context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
+    public void deleteScheduler() {
+        SharedPreferences preferences = context.getSharedPreferences(NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.commit();
@@ -54,11 +66,11 @@ public class LocalDataBase {
     }
 
 
-    public static void setCurrentTime(Float currentTime) {//for save store Id
+    public void setCurrentTime(String currentTime) {//for save  Id
         try {
-            SharedPreferences preferences =MainActivity. context.getSharedPreferences(CURRENT_TIME, Context.MODE_PRIVATE);
+            SharedPreferences preferences = context.getSharedPreferences(SET_CURRENT_TIME, Context.MODE_PRIVATE);
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putFloat("currentTime", currentTime);
+            editor.putString("currentTime1", currentTime);
             editor.apply();
         } catch (Exception e) {
         }
@@ -66,14 +78,14 @@ public class LocalDataBase {
 
     }
 
-    public static Float getCurrentTime() {//for save store Id
-        SharedPreferences prfs =MainActivity. context.getSharedPreferences(CURRENT_TIME, Context.MODE_PRIVATE);
-        Float schedulerTime = prfs.getFloat("currentTime", 0f);
+    public String getCurrentTime() {//for save store Id
+        SharedPreferences prfs = context.getSharedPreferences(SET_CURRENT_TIME, Context.MODE_PRIVATE);
+        String schedulerTime = prfs.getString("currentTime1", "0");
         return schedulerTime;
     }
 
-    public static void deleteCurrentTime() {
-        SharedPreferences preferences = MainActivity.context.getSharedPreferences(CURRENT_TIME, Context.MODE_PRIVATE);
+    public void deleteCurrentTime() {
+        SharedPreferences preferences = context.getSharedPreferences(SET_CURRENT_TIME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.commit();
@@ -81,7 +93,28 @@ public class LocalDataBase {
         // saveScheduler(schedulerTime);
     }
 
+    public void timeSpeechStatusSet(boolean status) {//for save store Id
+        try {
+            SharedPreferences preferences = context.getSharedPreferences(SPEECT_STATUS, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putBoolean("status", status);
+            editor.apply();
+        } catch (Exception e) {
+        }
+    }
 
+    public Boolean getSpeechStatus() {//for save store Id
+        SharedPreferences prfs = context.getSharedPreferences(SPEECT_STATUS, Context.MODE_PRIVATE);
+        Boolean status = prfs.getBoolean("status", false);
+        return status;
+    }
 
+    public boolean deleteAllData() {
+        deleteScheduler();
+        deleteCurrentTime();
+        deletescheduleTimeForSelecteda();
+
+        return true;
+    }
 
 }
